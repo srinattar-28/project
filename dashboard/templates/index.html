@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remote Board Monitoring &mdash; Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark">RB</div>
+        <div class="brand-text">
+          <span class="brand-line">Remote Board</span>
+          <span class="brand-line">Monitoring</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <span class="nav-icon" data-icon="grid"></span>
+          Dashboard
+        </a>
+        <a href="#" class="nav-item" data-page="settings">
+          <span class="nav-icon" data-icon="gear"></span>
+          Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="sidebar-footer-label">Firmware</span>
+        <span class="sidebar-footer-value">v2.3.1</span>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="main">
+
+      <!-- HEADER -->
+      <header class="topbar">
+        <div class="topbar-titles">
+          <h1>Dashboard</h1>
+          <p>Real-time monitoring of environmental test node</p>
+        </div>
+
+        <div class="topbar-controls">
+          <label class="device-select">
+            <span class="device-select-label">Device</span>
+            <select id="deviceSelector">
+              <option value="NODE-001" selected>NODE-001</option>
+            </select>
+          </label>
+
+          <div class="connection-status" id="connectionStatus" data-state="online">
+            <span class="status-dot"></span>
+            <span class="status-text">ONLINE</span>
+          </div>
+
+          <div class="last-updated">
+            <span class="last-updated-label">Last updated</span>
+            <span class="last-updated-value" id="lastUpdated">&mdash;</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <!-- SECTION A: SENSOR SUMMARY CARDS -->
+        <section class="summary-grid" aria-label="Sensor summary">
+
+          <article class="summary-card" data-sensor="temperature">
+            <div class="summary-card-head">
+              <span class="summary-icon" data-icon="thermometer"></span>
+              <span class="summary-name">Temperature</span>
+              <span class="status-badge" data-status="normal">Normal</span>
+            </div>
+            <div class="summary-value-row">
+              <span class="summary-value" id="tempCurrentValue">--</span>
+              <span class="summary-unit">&deg;C</span>
+              <span class="trend-indicator" id="tempTrend" data-direction="flat">&mdash;</span>
+            </div>
+          </article>
+
+          <article class="summary-card" data-sensor="pressure">
+            <div class="summary-card-head">
+              <span class="summary-icon" data-icon="gauge"></span>
+              <span class="summary-name">Barometer</span>
+              <span class="status-badge" data-status="normal">Normal</span>
+            </div>
+            <div class="summary-value-row">
+              <span class="summary-value" id="pressureCurrentValue">--</span>
+              <span class="summary-unit">hPa</span>
+              <span class="trend-indicator" id="pressureTrend" data-direction="flat">&mdash;</span>
+            </div>
+          </article>
+
+          <article class="summary-card" data-sensor="imu">
+            <div class="summary-card-head">
+              <span class="summary-icon" data-icon="axis"></span>
+              <span class="summary-name">IMU</span>
+              <span class="status-badge" data-status="normal">Normal</span>
+            </div>
+            <div class="summary-value-row">
+              <span class="summary-value" id="imuCurrentValue">--</span>
+              <span class="summary-unit">g RMS</span>
+              <span class="trend-indicator" id="imuTrend" data-direction="flat">&mdash;</span>
+            </div>
+          </article>
+
+        </section>
+
+        <!-- LIVE TELEMETRY CHARTS -->
+        <section class="panel" aria-label="Live telemetry">
+          <div class="panel-head">
+            <h2>Live Telemetry</h2>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-card">
+              <div class="chart-card-head">
+                <span>Temperature</span>
+                <span class="chart-card-unit">&deg;C</span>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas id="temperatureChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-head">
+                <span>Barometer</span>
+                <span class="chart-card-unit">hPa</span>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas id="pressureChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-head">
+                <span>IMU Acceleration</span>
+                <span class="chart-card-unit">g</span>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas id="imuChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LIVE SENSOR VALUES -->
+        <section class="panel" aria-label="Live sensor values">
+          <div class="panel-head">
+            <h2>Live Sensor Values</h2>
+          </div>
+          <div class="values-grid">
+
+            <div class="value-card" data-sensor="temperature">
+              <div class="value-card-head">
+                <span>Temperature</span>
+                <span class="status-badge" data-status="normal" id="tempStatusBadge">Normal</span>
+              </div>
+              <div class="value-card-main">
+                <span class="value-card-big" id="tempBigValue">--</span>
+                <span class="value-card-unit">&deg;C</span>
+              </div>
+              <dl class="value-stat-list">
+                <div><dt>Min</dt><dd id="tempMin">--</dd></div>
+                <div><dt>Max</dt><dd id="tempMax">--</dd></div>
+                <div><dt>Average</dt><dd id="tempAvg">--</dd></div>
+              </dl>
+            </div>
+
+            <div class="value-card" data-sensor="pressure">
+              <div class="value-card-head">
+                <span>Barometer</span>
+                <span class="status-badge" data-status="normal" id="pressureStatusBadge">Normal</span>
+              </div>
+              <div class="value-card-main">
+                <span class="value-card-big" id="pressureBigValue">--</span>
+                <span class="value-card-unit">hPa</span>
+              </div>
+              <dl class="value-stat-list">
+                <div><dt>Min</dt><dd id="pressureMin">--</dd></div>
+                <div><dt>Max</dt><dd id="pressureMax">--</dd></div>
+                <div><dt>Average</dt><dd id="pressureAvg">--</dd></div>
+              </dl>
+            </div>
+
+            <div class="value-card" data-sensor="imu">
+              <div class="value-card-head">
+                <span>IMU</span>
+                <span class="status-badge" data-status="normal" id="imuStatusBadge">Normal</span>
+              </div>
+
+              <div class="imu-subgroup">
+                <span class="imu-subgroup-label">Accelerometer (g)</span>
+                <dl class="value-stat-list value-stat-list--triplet">
+                  <div><dt>X</dt><dd id="accelX">--</dd></div>
+                  <div><dt>Y</dt><dd id="accelY">--</dd></div>
+                  <div><dt>Z</dt><dd id="accelZ">--</dd></div>
+                </dl>
+              </div>
+
+              <div class="imu-subgroup">
+                <span class="imu-subgroup-label">Gyroscope (&deg;/s)</span>
+                <dl class="value-stat-list value-stat-list--triplet">
+                  <div><dt>X</dt><dd id="gyroX">--</dd></div>
+                  <div><dt>Y</dt><dd id="gyroY">--</dd></div>
+                  <div><dt>Z</dt><dd id="gyroZ">--</dd></div>
+                </dl>
+              </div>
+
+              <div class="value-card-main value-card-main--rms">
+                <span class="value-card-big" id="imuRmsValue">--</span>
+                <span class="value-card-unit">g RMS</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- RECENT ALERTS -->
+        <section class="panel" aria-label="Recent alerts">
+          <div class="panel-head">
+            <h2>Recent Alerts</h2>
+            <span class="panel-head-meta" id="alertCount">0 active</span>
+          </div>
+          <div class="table-wrap">
+            <table class="alerts-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Sensor</th>
+                  <th>Value</th>
+                  <th>Threshold</th>
+                  <th>Severity</th>
+                  <th>Status</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody id="alertsTableBody">
+                <tr class="alerts-empty-row">
+                  <td colspan="7">No alerts recorded yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- CSV EXPORT -->
+        <section class="panel" aria-label="CSV export">
+          <div class="panel-head">
+            <h2>Export Telemetry</h2>
+          </div>
+          <form class="export-form" id="exportForm">
+            <label class="export-field">
+              <span>Sensor</span>
+              <select id="exportSensor" name="sensor">
+                <option value="all">All Sensors</option>
+                <option value="temperature">Temperature</option>
+                <option value="pressure">Barometer</option>
+                <option value="imu">IMU</option>
+              </select>
+            </label>
+
+            <label class="export-field">
+              <span>Start date/time</span>
+              <input type="datetime-local" id="exportStart" name="start" />
+            </label>
+
+            <label class="export-field">
+              <span>End date/time</span>
+              <input type="datetime-local" id="exportEnd" name="end" />
+            </label>
+
+            <button type="submit" class="export-button" id="exportButton">
+              Export CSV
+            </button>
+          </form>
+          <p class="export-status" id="exportStatus"></p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
